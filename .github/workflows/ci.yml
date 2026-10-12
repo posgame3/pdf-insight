@@ -55,7 +55,8 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Runs once the Worker URL is configured: gh variable set VITE_API_URL --body https://…workers.dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.VITE_API_URL != ''
     needs: [quality, e2e]
     runs-on: ubuntu-latest
     permissions:
