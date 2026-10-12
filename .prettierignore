@@ -1,0 +1,7 @@
+dist
+web/public/pdfjs
+.wrangler
+playwright-report
+test-results
+package-lock.json
+shared/insight.schema.json
