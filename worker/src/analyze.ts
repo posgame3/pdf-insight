@@ -9,7 +9,7 @@ import {
   type ModelOverview,
 } from '@pdf-insight/shared';
 import type { z } from 'zod';
-import type { CompleteStructured, InputBlock, ModelMessage } from './anthropic';
+import type { CompleteStructured, InputBlock, ModelMessage } from './model/types';
 import { planChunks } from './chunking';
 import { sortedUnique, uniqueBy } from './collections';
 import { AppError } from './errors';

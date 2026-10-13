@@ -1,5 +1,5 @@
 import type { ModelAnalysis } from '@pdf-insight/shared';
-import type { InputBlock } from './anthropic';
+import type { InputBlock } from './model/types';
 import type { Chunk } from './chunking';
 
 /**

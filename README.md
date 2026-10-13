@@ -31,7 +31,7 @@ Pełna lista 18 pułapek i sposób ich obsługi: [docs/test-documents.md](docs/t
 ```mermaid
 flowchart LR
   A["Przeglądarka<br/>React + pdf.js<br/>ekstrakcja, ukryty tekst, skany"] -- "tekst + obrazy skanów" --> B["Cloudflare Worker<br/>CORS, limity, Zod"]
-  B -- "structured outputs" --> C["Claude Opus 5.5"]
+  B -- "structured outputs" --> C["Claude Opus 5.5<br/>przez OpenRouter"]
   B -- "Insight JSON<br/>zweryfikowany cytatami" --> A
 ```
 
@@ -56,24 +56,25 @@ Szczegóły: [docs/architecture.md](docs/architecture.md).
 
 ## Uruchomienie lokalne
 
-Wymagania: Node 22 (`.nvmrc`), konto Cloudflare (tylko do wdrożenia), klucz API Anthropic.
+Wymagania: Node 22 (`.nvmrc`), konto Cloudflare (tylko do wdrożenia), klucz API OpenRouter (albo Anthropic).
 
 ```bash
 npm install
-cp worker/.dev.vars.example worker/.dev.vars   # wpisz własny ANTHROPIC_API_KEY (plik jest w .gitignore)
+cp worker/.dev.vars.example worker/.dev.vars   # wpisz własny OPENROUTER_API_KEY (plik jest w .gitignore)
 npm run dev:worker                              # API na http://localhost:8787
 npm run dev                                     # aplikacja na http://localhost:5173/pdf-insight/
 ```
 
 ## Zmienne środowiskowe
 
-| Zmienna             | Gdzie                                   | Opis                                                                 |
-| ------------------- | --------------------------------------- | -------------------------------------------------------------------- |
-| `VITE_API_URL`      | build frontendu (zmienna repo w GitHub) | Adres Workera. Publiczny. Lokalnie domyślnie `http://localhost:8787` |
-| `ANTHROPIC_API_KEY` | sekret Workera / `worker/.dev.vars`     | Klucz API. **Nigdy** w repo ani we frontendzie                       |
-| `ANTHROPIC_MODEL`   | `worker/wrangler.jsonc`                 | Domyślnie `claude-opus-5-5`                                          |
-| `ANTHROPIC_EFFORT`  | `worker/wrangler.jsonc`                 | `low` / `medium` / `high` – kompromis jakość / czas                  |
-| `ALLOWED_ORIGINS`   | `worker/wrangler.jsonc` / `.dev.vars`   | Dozwolone originy CORS, po przecinku                                 |
+| Zmienna              | Gdzie                                   | Opis                                                                                                  |
+| -------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `VITE_API_URL`       | build frontendu (zmienna repo w GitHub) | Adres Workera. Publiczny. Lokalnie domyślnie `http://localhost:8787`                                  |
+| `OPENROUTER_API_KEY` | sekret Workera / `worker/.dev.vars`     | Klucz API (lub `ANTHROPIC_API_KEY` przy `AI_PROVIDER=anthropic`). **Nigdy** w repo ani we frontendzie |
+| `AI_PROVIDER`        | `worker/wrangler.jsonc`                 | `openrouter` (domyślnie) lub `anthropic`                                                              |
+| `AI_MODEL`           | `worker/wrangler.jsonc`                 | Domyślnie `anthropic/claude-opus-5.5` (OpenRouter) / `claude-opus-5-5` (Anthropic)                    |
+| `AI_EFFORT`          | `worker/wrangler.jsonc`                 | `low` / `medium` / `high` – kompromis jakość / czas                                                   |
+| `ALLOWED_ORIGINS`    | `worker/wrangler.jsonc` / `.dev.vars`   | Dozwolone originy CORS, po przecinku                                                                  |
 
 ## Testy i jakość
 
@@ -106,7 +107,7 @@ python3 evals/check_insight.py wynik.insight.json --expect evals/expectations/um
 ```bash
 cd worker
 npx wrangler login
-npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler secret put OPENROUTER_API_KEY
 npx wrangler deploy                       # wypisze adres https://pdf-insight-api.<subdomena>.workers.dev
 gh variable set VITE_API_URL --body "https://pdf-insight-api.<subdomena>.workers.dev"
 ```
@@ -116,7 +117,7 @@ Push do `main` buduje frontend z `VITE_API_URL` i publikuje go na GitHub Pages (
 ## Znane ograniczenia
 
 - **Czas:** zwykle 15–30 s (Opus 5.5, effort `medium`). Długie dokumenty są dzielone na części i mogą przekroczyć
-  30 s. Szybszy wariant to `ANTHROPIC_EFFORT=low` lub `claude-sonnet-5-5`.
+  30 s. Szybszy wariant to `AI_EFFORT=low` lub `AI_MODEL=anthropic/claude-sonnet-5.5`.
 - **Skany:**
   - do modelu trafia do 6 skanów, kolejne są oznaczane jako nieprzeczytane;
   - wartości ze skanów nie da się automatycznie potwierdzić z tekstem.
@@ -125,9 +126,9 @@ Push do `main` buduje frontend z `VITE_API_URL` i publikuje go na GitHub Pages (
   - Worker na darmowym planie Cloudflare ma limit CPU, więc bardzo duże żądania mogą wymagać planu płatnego.
 - **Ukryty tekst:** niewidoczny tekst nałożony dokładnie na inny, widoczny tekst nie zostanie wykryty
   ([model zagrożeń](docs/threat-model.md)).
-- **Ochrona przed nadużyciami:** demo nie ma logowania. Chroni je rate limit i limit wydatków w konsoli Anthropic,
+- **Ochrona przed nadużyciami:** demo nie ma logowania. Chroni je rate limit i limit kredytów na koncie OpenRouter,
   a CORS nie jest uwierzytelnieniem.
-- **Prywatność:** tekst dokumentu trafia do Anthropic (USA). Aplikacja informuje o tym przed wgraniem pliku.
+- **Prywatność:** tekst dokumentu trafia przez OpenRouter do Anthropic (USA); Worker wymaga dostawców, którzy nie przechowują promptów (`data_collection: deny`). Aplikacja informuje o tym przed wgraniem pliku.
 
 ## Jak powstał ten projekt
 

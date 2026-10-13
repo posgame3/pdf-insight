@@ -4,12 +4,12 @@ Jak AI było użyte do zbudowania PDF Insight: narzędzia, najważniejsze prompt
 
 ## Narzędzia
 
-| Narzędzie                                            | Do czego                                                                                            |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| **Claude Code** (aplikacja desktop, Claude Opus 5.5) | Analiza briefu i PDF testowego, plan, cały kod, testy, dokumentacja, CI, przegląd zmian             |
-| **Claude Opus 5.5 przez API**                        | Model w aplikacji (structured outputs, vision dla skanów)                                           |
-| **Playwright** sterowany przez Claude Code           | Render stron PDF do analizy pułapek, testy e2e, narzędzie `inspect` (co przeglądarka wysyła do API) |
-| Drugi agent AI (niezależna analiza)                  | Porównanie listy pułapek w dokumencie testowym z moją, żeby niczego nie przeoczyć                   |
+| Narzędzie                                            | Do czego                                                                                                 |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Claude Code** (aplikacja desktop, Claude Opus 5.5) | Analiza briefu i PDF testowego, plan, cały kod, testy, dokumentacja, CI, przegląd zmian                  |
+| **Claude Opus 5.5 przez OpenRouter**                 | Model w aplikacji (structured outputs, vision dla skanów); klient Anthropic API zostaje jako alternatywa |
+| **Playwright** sterowany przez Claude Code           | Render stron PDF do analizy pułapek, testy e2e, narzędzie `inspect` (co przeglądarka wysyła do API)      |
+| Drugi agent AI (niezależna analiza)                  | Porównanie listy pułapek w dokumencie testowym z moją, żeby niczego nie przeoczyć                        |
 
 Kontekst dla AI jest częścią repozytorium:
 
