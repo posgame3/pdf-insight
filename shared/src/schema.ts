@@ -90,13 +90,18 @@ const summarySchema = z
   .string()
   .trim()
   .min(1)
-  .max(1500)
-  .refine((text) => {
+  .max(2500)
+  .superRefine((text, context) => {
     const sentences = countSentences(text);
-    return sentences >= SUMMARY_SENTENCES.min && sentences <= SUMMARY_SENTENCES.max;
-  }, `Podsumowanie musi mieć od ${SUMMARY_SENTENCES.min} do ${SUMMARY_SENTENCES.max} zdań`)
+    if (sentences < SUMMARY_SENTENCES.min || sentences > SUMMARY_SENTENCES.max) {
+      context.addIssue({
+        code: 'custom',
+        message: `Podsumowanie musi mieć od ${SUMMARY_SENTENCES.min} do ${SUMMARY_SENTENCES.max} zdań, a ma ${sentences}`,
+      });
+    }
+  })
   .describe(
-    '3–5 full sentences in the document language, without abbreviations, reflecting the terms currently in force',
+    'Exactly 4 full sentences (3–5 accepted, about 600–900 characters) in the document language, without abbreviations, reflecting the terms currently in force',
   );
 
 const keyPointsSchema = z

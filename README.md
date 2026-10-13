@@ -31,7 +31,7 @@ Pełna lista 18 pułapek i sposób ich obsługi: [docs/test-documents.md](docs/t
 ```mermaid
 flowchart LR
   A["Przeglądarka<br/>React + pdf.js<br/>ekstrakcja, ukryty tekst, skany"] -- "tekst + obrazy skanów" --> B["Cloudflare Worker<br/>CORS, limity, Zod"]
-  B -- "structured outputs" --> C["Claude Opus 5.5<br/>przez OpenRouter"]
+  B -- "structured outputs" --> C["Claude Sonnet 5.5<br/>przez OpenRouter"]
   B -- "Insight JSON<br/>zweryfikowany cytatami" --> A
 ```
 
@@ -51,7 +51,7 @@ Szczegóły: [docs/architecture.md](docs/architecture.md).
 | [Ekstrakcja w przeglądarce, ukryty tekst przez render](docs/decisions/0002-client-side-extraction.md) | Tylko render pokazuje, co widzi człowiek; plik nie opuszcza urządzenia                         |
 | [Structured outputs + Zod + 1 retry](docs/decisions/0003-structured-outputs-and-validation.md)        | Opus 5.5 nie obsługuje wymuszonego `tool_choice`; Zod pilnuje reguł, których API nie przyjmuje |
 | [Weryfikacja cytatami](docs/decisions/0004-evidence-verification.md)                                  | Zod sprawdza strukturę, nie prawdę                                                             |
-| [Claude Opus 5.5, effort medium](docs/decisions/0005-model-choice.md)                                 | Aneksy, role kwot i sprzeczności wymagają rozumowania; model zmienia się jedną zmienną         |
+| [Claude Sonnet 5.5 przez OpenRouter](docs/decisions/0005-model-choice.md)                             | Zmierzone na demo: 15–27 s i czysty eval; Opus 5.5 przekraczał 30 s                            |
 | [Jedna strona bez routera](docs/decisions/0006-single-page-app-on-pages.md)                           | Brak problemu 404 na GitHub Pages                                                              |
 
 ## Uruchomienie lokalne
@@ -84,7 +84,7 @@ npm run e2e      # Playwright: desktop i 360 px, API mockowane
 python3 evals/check_insight.py wynik.insight.json --expect evals/expectations/umowa-14-2026.json
 ```
 
-- **145 testów jednostkowych** (Vitest):
+- **160 testów jednostkowych** (Vitest):
   - schemat i kontrakt API;
   - liczenie zdań;
   - rozpoznawanie kwot i dat;
@@ -116,8 +116,8 @@ Push do `main` buduje frontend z `VITE_API_URL` i publikuje go na GitHub Pages (
 
 ## Znane ograniczenia
 
-- **Czas:** zwykle 15–30 s (Opus 5.5, effort `medium`). Długie dokumenty są dzielone na części i mogą przekroczyć
-  30 s. Szybszy wariant to `AI_EFFORT=low` lub `AI_MODEL=anthropic/claude-sonnet-5.5`.
+- **Czas:** dokument testowy (12 stron + skan) 15–27 s na Claude Sonnet 5.5. Bardzo długie dokumenty są dzielone na
+  części i mogą przekroczyć 30 s. Opus 5.5 (`AI_MODEL=anthropic/claude-opus-5.5`) daje podobną jakość, ale ok. 45 s.
 - **Skany:**
   - do modelu trafia do 6 skanów, kolejne są oznaczane jako nieprzeczytane;
   - wartości ze skanów nie da się automatycznie potwierdzić z tekstem.

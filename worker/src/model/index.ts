@@ -6,7 +6,7 @@ export const PROVIDERS = ['openrouter', 'anthropic'] as const;
 export type Provider = (typeof PROVIDERS)[number];
 
 export const DEFAULT_MODELS: Record<Provider, string> = {
-  openrouter: 'anthropic/claude-opus-5.5',
+  openrouter: 'anthropic/claude-sonnet-5.5',
   anthropic: 'claude-opus-5-5',
 };
 

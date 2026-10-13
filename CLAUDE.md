@@ -54,7 +54,7 @@ python3 evals/check_insight.py wynik.insight.json --expect evals/expectations/um
 ## Model AI
 
 - Dostawca `AI_PROVIDER` (`openrouter` domyślnie, `anthropic` alternatywnie), model `AI_MODEL`
-  (`anthropic/claude-opus-5.5`), effort `AI_EFFORT` (`medium`) – w `worker/wrangler.jsonc`. Klienci: `worker/src/model/`.
+  (`anthropic/claude-sonnet-5.5`), effort `AI_EFFORT` (`medium`); pomiary w ADR 0005 – w `worker/wrangler.jsonc`. Klienci: `worker/src/model/`.
 - Opus 5.5 **nie obsługuje** wymuszonego `tool_choice` ani wyłączenia myślenia – używamy structured outputs
   (`response_format` w OpenRouter, `output_config.format` w Anthropic API). Ten tryb odrzuca `minLength`, `maxItems` itp., więc `worker/src/structuredOutput.ts`
   je usuwa, a pełną walidację robi Zod z jedną ponowną próbą (`worker/src/analyze.ts`).

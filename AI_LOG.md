@@ -4,12 +4,12 @@ Jak AI było użyte do zbudowania PDF Insight: narzędzia, najważniejsze prompt
 
 ## Narzędzia
 
-| Narzędzie                                            | Do czego                                                                                                 |
-| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| **Claude Code** (aplikacja desktop, Claude Opus 5.5) | Analiza briefu i PDF testowego, plan, cały kod, testy, dokumentacja, CI, przegląd zmian                  |
-| **Claude Opus 5.5 przez OpenRouter**                 | Model w aplikacji (structured outputs, vision dla skanów); klient Anthropic API zostaje jako alternatywa |
-| **Playwright** sterowany przez Claude Code           | Render stron PDF do analizy pułapek, testy e2e, narzędzie `inspect` (co przeglądarka wysyła do API)      |
-| Drugi agent AI (niezależna analiza)                  | Porównanie listy pułapek w dokumencie testowym z moją, żeby niczego nie przeoczyć                        |
+| Narzędzie                                            | Do czego                                                                                                    |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Claude Code** (aplikacja desktop, Claude Opus 5.5) | Analiza briefu i PDF testowego, plan, cały kod, testy, dokumentacja, CI, przegląd zmian                     |
+| **Claude Sonnet 5.5 przez OpenRouter**               | Model w aplikacji (structured outputs, vision dla skanów). Opus 5.5 i bezpośrednie API Anthropic jako opcje |
+| **Playwright** sterowany przez Claude Code           | Render stron PDF do analizy pułapek, testy e2e, narzędzie `inspect` (co przeglądarka wysyła do API)         |
+| Drugi agent AI (niezależna analiza)                  | Porównanie listy pułapek w dokumencie testowym z moją, żeby niczego nie przeoczyć                           |
 
 Kontekst dla AI jest częścią repozytorium:
 
@@ -70,10 +70,22 @@ Kontekst dla AI jest częścią repozytorium:
 | 6   | Testy komponentów szukały tekstu w całym widoku i trafiały też w podgląd JSON. Asercje były niejednoznaczne.                                                       | Vitest (błąd „multiple elements”)                           | Zapytania zawężone do konkretnego regionu (`within`) albo selektora                                                                                                                                                                              |
 | 7   | Pierwsza wersja kodu nie przechodziła ESLint `strictTypeChecked` (43 problemy: `ReadonlyArray`, `any` z `expect.*`, asercje `!`).                                  | `eslint --max-warnings 0`                                   | Poprawki w kodzie. Wyłączenie `no-unsafe-assignment` tylko w testach, z uzasadnieniem w konfiguracji                                                                                                                                             |
 
+## Błędy wykryte dopiero na żywym demo (2026-10-13)
+
+Pierwsze prawdziwe analizy dokumentu testowego przez publiczne demo pokazały problemy, których testy z mockiem
+API nie mogły złapać:
+
+| #   | Problem                                                 | Diagnoza                                                                                                                                                                | Poprawka                                                                                                                                                                                         |
+| --- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 8   | Opus 5.5 przekraczał limit 85 s, także na effort `low`. | Log Workera: CPU 24 ms, brak ponownej próby. Mały dokument przechodził w 10 s, więc czas zjadała długość odpowiedzi (kilkadziesiąt kwot i dat z cytatami), nie wejście. | Trzy równoległe wywołania na część dokumentu (opis / kwoty / daty) z węższymi schematami. Zmiana modelu na Sonnet 5.5 po pomiarach ([ADR 0005](docs/decisions/0005-model-choice.md)).            |
+| 9   | Sonnet odpadał na walidacji podsumowania.               | Do logu dodane komunikaty walidacji (bez treści dokumentu): „a ma 7”, potem „a ma 6”.                                                                                   | Prompt „dokładnie 4 zdania”. Komunikat z liczbą zdań dla ponownej próby. Licznik zdań poprawiony: granica zdania wymaga wielkiej litery, bo „ok. 3 400” i „2027 r. 13 100 zł” nie kończą zdania. |
+| 10  | 9 dat z tabel oznaczonych jako niepotwierdzone.         | Model cytuje wiersz tabeli w innej kolejności komórek niż warstwa tekstowa PDF. Do tego `textMentionsDate` usuwał spacje i sklejał sąsiednie daty.                      | Dopasowanie cytatu po tokenach na tej samej stronie. Daty dopasowywane z zachowaniem spacji. Test regresyjny.                                                                                    |
+| 11  | Eval oznaczył 295 200 zł jako wyliczone przez model.    | Kwota jest napisana w dokumencie. **To był mój błąd w oczekiwaniach evalu, nie błąd modelu**, który oznaczył ją jako nieaktualną po aneksie.                            | Oczekiwanie przeniesione do sekcji „soft” z opisem.                                                                                                                                              |
+
 ## Co zostało zweryfikowane ręcznie, a co automatycznie
 
 - **Automatycznie:**
-  - 145 testów jednostkowych i 10 e2e (desktop + 360 px);
+  - 160 testów jednostkowych i 10 e2e (desktop + 360 px);
   - lint, typecheck i build w CI;
   - gitleaks na całej historii;
   - eval wyniku na dokumencie testowym.

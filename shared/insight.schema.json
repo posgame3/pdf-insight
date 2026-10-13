@@ -70,8 +70,8 @@
     "summary": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 1500,
-      "description": "3–5 full sentences in the document language, without abbreviations, reflecting the terms currently in force"
+      "maxLength": 2500,
+      "description": "Exactly 4 full sentences (3–5 accepted, about 600–900 characters) in the document language, without abbreviations, reflecting the terms currently in force"
     },
     "keyPoints": {
       "minItems": 3,

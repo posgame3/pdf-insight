@@ -36,6 +36,7 @@ describe('textMentionsDate', () => {
     ['signed on March 12, 2026', '2026-03-12'],
     ['on 12th March 2026', '2026-03-12'],
     ['termin 2026-10-01', '2026-10-01'],
+    ['01.04.2026 30.04.2026 15%', '2026-04-30'],
   ])('finds %s', (text, iso) => {
     expect(textMentionsDate(text, iso)).toBe(true);
   });
@@ -76,6 +77,16 @@ describe('createEvidenceVerifier', () => {
 
   it('marks values read from scanned pages as such', () => {
     expect(verify({ page: 3, quote: '13 100,00 zł' }, () => true).verification).toBe('scan');
+  });
+
+  it('confirms a table row quoted in a different cell order than the text layer', () => {
+    const table = createEvidenceVerifier(
+      [{ page: 3, text: 'Etap Start Koniec Udział Kwota\nE1 01.04.2026\n30.04.2026 15%\n27 675,00 zł' }],
+      [],
+    );
+    const quote = '01.04.2026 30.04.2026 15% 27 675,00 zł';
+    expect(table({ page: 3, quote }, (text) => textMentionsDate(text, '2026-04-30')).verification).toBe('text');
+    expect(table({ page: 3, quote: '01.04.2026 31.05.2026 15%' }, () => true).verification).toBe('unconfirmed');
   });
 
   it('flags a quote that does not occur in the document', () => {

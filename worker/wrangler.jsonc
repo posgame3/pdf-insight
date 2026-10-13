@@ -11,7 +11,7 @@
   "vars": {
     "ALLOWED_ORIGINS": "https://posgame3.github.io",
     "AI_PROVIDER": "openrouter",
-    "AI_MODEL": "anthropic/claude-opus-5.5",
+    "AI_MODEL": "anthropic/claude-sonnet-5.5",
     "AI_EFFORT": "medium",
   },
   // Per-IP limit on /analyze. Each analysis costs real money, so the limit is deliberately tight.

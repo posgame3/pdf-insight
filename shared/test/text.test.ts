@@ -31,6 +31,8 @@ describe('countSentences', () => {
     ['Umowę podpisał J. Kowalski. Obowiązuje do końca 2027 r.', 2],
     ['The fee is EUR 2,150 per year, i.e. EUR 8,600 in total. It is paid annually.', 2],
     ['Wartość wynosi 4,2 mln zł. Zysk 1.3 mln.', 2],
+    ['Firma obsługuje ok. 3 400 klientów. Abonament do 31 marca 2027 r. 13 100 zł netto jest stały.', 2],
+    ['Zmiany, tzn. aneks, obowiązują od kwietnia. Pozostałe warunki bez zmian.', 2],
   ])('%j has %i sentences', (text, expected) => {
     expect(countSentences(text)).toBe(expected);
   });

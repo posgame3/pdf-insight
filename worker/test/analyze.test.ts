@@ -54,8 +54,9 @@ describe('analyzeDocument', () => {
     const model = fakeModel(invalid, modelAnalysis());
     const insight = await analyzeDocument(analyzeRequest(), deps(model.complete));
 
-    expect(model.calls).toHaveLength(2);
-    const retryMessages = model.calls[1]?.messages ?? [];
+    // summary, amounts and dates run in parallel; only the invalid summary call is retried.
+    expect(model.calls).toHaveLength(4);
+    const retryMessages = model.calls[3]?.messages ?? [];
     expect(retryMessages.map((message) => message.role)).toEqual(['user', 'assistant', 'user']);
     expect(JSON.stringify(retryMessages[2])).toContain('summary');
     expect(insight.summary).toBe(modelAnalysis().summary);
@@ -66,7 +67,19 @@ describe('analyzeDocument', () => {
     await expect(analyzeDocument(analyzeRequest(), deps(model.complete))).rejects.toMatchObject({
       code: 'ai_invalid_response',
     } satisfies Partial<AppError>);
-    expect(model.calls).toHaveLength(2);
+    expect(model.calls).toHaveLength(6);
+  });
+
+  it('splits each part into parallel summary, amounts and dates calls with narrow schemas', async () => {
+    const model = fakeModel(modelAnalysis());
+    await analyzeDocument(analyzeRequest(), deps(model.complete));
+    const propertiesOf = (index: number) => Object.keys(model.calls[index]?.schema.properties ?? {});
+
+    expect(model.calls).toHaveLength(3);
+    expect(propertiesOf(0)).toEqual(['document', 'summary', 'keyPoints', 'entities', 'keywords', 'warnings']);
+    expect(propertiesOf(1)).toEqual(['amounts']);
+    expect(propertiesOf(2)).toEqual(['dates']);
+    expect(model.calls[1]?.system).toContain('monetary amounts only');
   });
 
   it('wraps the document in a random boundary and sends scans as images', async () => {
@@ -106,7 +119,7 @@ describe('analyzeDocument', () => {
       keyPoints: ['Punkt pierwszy', 'Punkt drugi', 'Punkt trzeci'],
       keywords: ['umowa'],
     };
-    const model = fakeModel(modelAnalysis(), modelAnalysis(), modelAnalysis(), modelAnalysis(), overview);
+    const model = fakeModel(...Array.from({ length: 12 }, () => modelAnalysis()), overview);
     const request = analyzeRequest({
       pageCount: 4,
       pages: longPages,
