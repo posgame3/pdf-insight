@@ -29,6 +29,11 @@ export function toMatchKey(text: string): string {
 /** Abbreviations that never end a sentence, so a dot after them is not a sentence boundary. */
 const NON_TERMINAL_ABBREVIATIONS = new Set([
   'np',
+  'ok',
+  'tzn',
+  'lit',
+  'ew',
+  'mies',
   'tzw',
   'ul',
   'al',
@@ -64,7 +69,8 @@ const SENTENCE_END = /[.!?\u2026]+["'\u201D\u00BB)]*(?=\s|$)/gu;
 
 /**
  * Counts sentences in Polish or English prose. Dots after abbreviations ("np.", "ust.") and initials ("J.")
- * are not boundaries, and a boundary inside the text needs an upper-case letter or a digit after it.
+ * are not boundaries, and a boundary inside the text needs an upper-case letter after it (a digit is not enough:
+ * "ok. 3 400" or "2027 r. 13 100 zł" continue the sentence).
  */
 export function countSentences(text: string): number {
   const prose = normalizeText(text);
@@ -83,7 +89,7 @@ export function countSentences(text: string): number {
 
 function isSentenceBoundary(text: string, start: number, end: number): boolean {
   const rest = text.slice(end).trimStart();
-  if (rest !== '' && !/^["'\u201E\u201C\u00AB(]?[\p{Lu}\d]/u.test(rest)) return false;
+  if (rest !== '' && !/^["'\u201E\u201C\u00AB(]?\p{Lu}/u.test(rest)) return false;
   if (text[start] !== '.') return true;
   const word = /([\p{L}.]+)$/u.exec(text.slice(0, start))?.[1] ?? '';
   if (/^\p{Lu}$/u.test(word)) return false;

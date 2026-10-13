@@ -8,8 +8,9 @@ const ORIGIN = 'https://posgame3.github.io';
 
 function env(overrides: Partial<Env> = {}): Env {
   return {
-    ANTHROPIC_API_KEY: 'test-key',
-    ANTHROPIC_MODEL: 'claude-test',
+    AI_PROVIDER: 'openrouter',
+    OPENROUTER_API_KEY: 'test-key',
+    AI_MODEL: 'claude-test',
     ALLOWED_ORIGINS: `${ORIGIN}, http://localhost:5173`,
     ANALYZE_RATE_LIMITER: { limit: () => Promise.resolve({ success: true }) },
     ...overrides,
@@ -116,10 +117,10 @@ describe('handleRequest', () => {
   });
 
   it('returns a generic 500 without details when the API key is not configured', async () => {
-    const { response } = await send(post(analyzeRequest()), env({ ANTHROPIC_API_KEY: '' }));
+    const { response } = await send(post(analyzeRequest()), env({ OPENROUTER_API_KEY: '' }));
     expect(response.status).toBe(500);
     const body = JSON.stringify(await response.json());
-    expect(body).not.toContain('ANTHROPIC');
+    expect(body).not.toContain('API_KEY');
   });
 
   it('maps a timeout to 504', async () => {

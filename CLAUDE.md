@@ -38,7 +38,7 @@ python3 evals/check_insight.py wynik.insight.json --expect evals/expectations/um
 
 ## Bezpieczeństwo – twarde reguły
 
-- Klucz Anthropic tylko jako sekret Workera: `npx wrangler secret put ANTHROPIC_API_KEY` (w `worker/`).
+- Klucz API tylko jako sekret Workera: `npx wrangler secret put OPENROUTER_API_KEY` (w `worker/`).
   Lokalnie `worker/.dev.vars` (git-ignored). Nigdy w kodzie, `VITE_*`, logach, commitach ani w czacie.
 - Hook `.claude/hooks/guard-secrets.mjs` blokuje zapis kluczy – nie obchodź go.
 - Nie loguj treści dokumentów ani odpowiedzi modelu. Do logów tylko kody, rozmiary, czasy.
@@ -53,7 +53,8 @@ python3 evals/check_insight.py wynik.insight.json --expect evals/expectations/um
 
 ## Model AI
 
-- Domyślnie `claude-opus-5-5` (`ANTHROPIC_MODEL` w `worker/wrangler.jsonc`), effort `medium` (`ANTHROPIC_EFFORT`).
-- Opus 5.5 **nie obsługuje** wymuszonego `tool_choice` ani wyłączenia myślenia – używamy `output_config.format`
-  (structured outputs). Ten tryb odrzuca `minLength`, `maxItems` itp., więc `worker/src/structuredOutput.ts`
+- Dostawca `AI_PROVIDER` (`openrouter` domyślnie, `anthropic` alternatywnie), model `AI_MODEL`
+  (`anthropic/claude-sonnet-5.5`), effort `AI_EFFORT` (`medium`); pomiary w ADR 0005 – w `worker/wrangler.jsonc`. Klienci: `worker/src/model/`.
+- Opus 5.5 **nie obsługuje** wymuszonego `tool_choice` ani wyłączenia myślenia – używamy structured outputs
+  (`response_format` w OpenRouter, `output_config.format` w Anthropic API). Ten tryb odrzuca `minLength`, `maxItems` itp., więc `worker/src/structuredOutput.ts`
   je usuwa, a pełną walidację robi Zod z jedną ponowną próbą (`worker/src/analyze.ts`).

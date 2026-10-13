@@ -1,5 +1,5 @@
 import type { AnalyzeRequest, ModelAnalysis } from '@pdf-insight/shared';
-import type { CompleteStructured, StructuredRequest } from '../src/anthropic';
+import type { CompleteStructured, StructuredRequest } from '../src/model/types';
 
 export const PAGE_1 =
   'Umowa ramowa nr 14/2026 zawarta w dniu 12.03.2026 r. pomiędzy Nordwave Logistics sp. z o.o. a Kwadrat Software S.A.';

@@ -1,6 +1,7 @@
 import { AnalyzeRequestSchema, LIMITS } from '@pdf-insight/shared';
 import { analyzeDocument } from './analyze';
-import { createAnthropicClient, type CompleteStructured } from './anthropic';
+import { createModelClient } from './model';
+import type { CompleteStructured } from './model/types';
 import { readConfig, type Config, type Env } from './config';
 import { AppError, toAppError } from './errors';
 import { corsHeaders, emptyResponse, jsonResponse, readJsonBody } from './http';
@@ -14,7 +15,7 @@ export interface Dependencies {
 
 const defaultDependencies: Dependencies = {
   createClient: (config) =>
-    createAnthropicClient({ apiKey: config.apiKey, model: config.model, effort: config.effort }),
+    createModelClient(config.provider, { apiKey: config.apiKey, model: config.model, effort: config.effort }),
 };
 
 export async function handleRequest(

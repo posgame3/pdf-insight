@@ -63,8 +63,8 @@ export function UploadPanel({ notice, onFiles }: UploadPanelProps) {
         <ul>
           <li>Plik jest czytany w Twojej przeglądarce i nigdzie nie jest zapisywany.</li>
           <li>
-            Do analizy wysyłamy jego tekst oraz obrazy zeskanowanych stron: przez nasz serwer pośredniczący do modelu
-            Claude firmy Anthropic (USA).
+            Do analizy wysyłamy jego tekst oraz obrazy zeskanowanych stron: przez nasz serwer pośredniczący i bramkę
+            OpenRouter do modelu Claude firmy Anthropic (USA), z wyłączonym przechowywaniem danych przez dostawców.
           </li>
           <li>Nie wgrywaj dokumentów z danymi osobowymi lub poufnymi, jeśli nie możesz ich przekazać dostawcy AI.</li>
         </ul>

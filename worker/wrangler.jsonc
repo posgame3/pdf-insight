@@ -6,11 +6,13 @@
   "workers_dev": true,
   "preview_urls": false,
   "observability": { "enabled": true },
-  // Public configuration only. The API key is a secret: `npx wrangler secret put ANTHROPIC_API_KEY`.
+  // Public configuration only. The API key is a secret: `npx wrangler secret put OPENROUTER_API_KEY`
+  // (or ANTHROPIC_API_KEY with AI_PROVIDER=anthropic and AI_MODEL=claude-opus-5-5).
   "vars": {
     "ALLOWED_ORIGINS": "https://posgame3.github.io",
-    "ANTHROPIC_MODEL": "claude-opus-5-5",
-    "ANTHROPIC_EFFORT": "medium",
+    "AI_PROVIDER": "openrouter",
+    "AI_MODEL": "anthropic/claude-sonnet-5.5",
+    "AI_EFFORT": "medium",
   },
   // Per-IP limit on /analyze. Each analysis costs real money, so the limit is deliberately tight.
   "ratelimits": [{ "name": "ANALYZE_RATE_LIMITER", "namespace_id": "4201", "simple": { "limit": 5, "period": 60 } }],
