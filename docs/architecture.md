@@ -13,7 +13,7 @@ flowchart LR
   R -- "POST /analyze (JSON, bez pliku)" --> W
   subgraph Worker["Cloudflare Worker (pdf-insight-api)"]
     W[CORS, rate limit, limit body, Zod] --> C[Podział na części<br/>dla długich dokumentów]
-    C --> A[Claude Opus 5.5<br/>structured outputs]
+    C --> A[Claude Sonnet 5.5 przez OpenRouter<br/>3 równoległe wywołania: opis, kwoty, daty<br/>structured outputs]
     A --> Z{Zod OK?}
     Z -- nie --> A2[1 ponowna próba<br/>z listą błędów] --> Z2{Zod OK?}
     Z2 -- nie --> E[502 ai_invalid_response]
