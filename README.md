@@ -72,7 +72,7 @@ npm run dev                                     # aplikacja na http://localhost:
 | `VITE_API_URL`       | build frontendu (zmienna repo w GitHub) | Adres Workera. Publiczny. Lokalnie domyślnie `http://localhost:8787`                                  |
 | `OPENROUTER_API_KEY` | sekret Workera / `worker/.dev.vars`     | Klucz API (lub `ANTHROPIC_API_KEY` przy `AI_PROVIDER=anthropic`). **Nigdy** w repo ani we frontendzie |
 | `AI_PROVIDER`        | `worker/wrangler.jsonc`                 | `openrouter` (domyślnie) lub `anthropic`                                                              |
-| `AI_MODEL`           | `worker/wrangler.jsonc`                 | Domyślnie `anthropic/claude-opus-5.5` (OpenRouter) / `claude-opus-5-5` (Anthropic)                    |
+| `AI_MODEL`           | `worker/wrangler.jsonc`                 | Domyślnie `anthropic/claude-sonnet-5.5` (OpenRouter) / `claude-opus-5-5` (Anthropic)                  |
 | `AI_EFFORT`          | `worker/wrangler.jsonc`                 | `low` / `medium` / `high` – kompromis jakość / czas                                                   |
 | `ALLOWED_ORIGINS`    | `worker/wrangler.jsonc` / `.dev.vars`   | Dozwolone originy CORS, po przecinku                                                                  |
 
